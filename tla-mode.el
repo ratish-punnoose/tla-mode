@@ -33,7 +33,7 @@
 (defvar tla-mode-types
   '("Int" "BOOLEAN"))
 
-;;(defvar tla-tab-width nil "Width of a tab")
+(defvar tla-tab-width 2 "Width of a tab")
 
 (defvar tla-mode-syntax-table
   (let ((st (make-syntax-table)))
@@ -73,8 +73,8 @@
 
   (setq-local prettify-symbols-alist
               '(
-                ("/\\" . ?∧)         ("\\land" . ?∧)
-                ("\\/" . ?∨)         ("\\lor" . ?∨)
+                ("/\\" . ?∧)          ("\\land" . ?∧)
+                ("\\/" . ?∨)          ("\\lor" . ?∨)
                 ("=>" . ?⇒)
                 ("~" . ?¬)
                 ("\\lnot" . ?¬)       ("\\neg" . ?¬) 
@@ -83,18 +83,19 @@
                 ("\\in" . ?∈)
                 ("\\notin" . ?∉)
                 ("#" . ?≠)            ("/=" . ?≠)
-                                        ; << , >>
-                ("[]" . ?☐)
-                ;; eventually: No good rendering
+                ("<<" . ?⟨)
+                (">>" . ?⟩)
+                ("[]" . ?□)
+                ("<>" . ?◇)
                 ("<=" . ?⋜)           ("\\leq" . ?⋜)
                 (">=" . ?⋝)           ("\\geq" . ?⋝)
-                ;; ("~>" . ?⇝) not good rendering
+                ("~>" . ?↝)
                 ("\\ll" . ?\《)
                 ("\\gg" . ?\》)
-                ;; "-+->" no satisfactory rendering
+                ("-+->" . ?⇸)
                 ("\\prec" . ?≺)
                 ("\\succ" . ?≻)
-                ;; "|->" omitting as the typed is better than rendered
+                ("|->" . ?↦)
                 ("\\preceq" . ?⋞)
                 ("\\succeq" . ?≽)
                 ("\\div" . ?÷)
@@ -119,9 +120,9 @@
                 ;; -> typed better than rendered
                 ;; <- typed better than rendered
                 ("\\simeq" . ?≃)
-                ("\\cap" . ?∩)       ("\\intersect" . ?∩)
-                ("\\cup" . ?∪)      ("\\union" . ?∪)
-                ;; \\asymp no good rendering
+                ("\\cap" . ?∩)          ("\\intersect" . ?∩)
+                ("\\cup" . ?∪)          ("\\union" . ?∪)
+                ("\\asymp" . ?≍)
                 ("\\sqcap" . ?⊓)
                 ("\\sqcup" . ?⊔)
                 ("\\approx" . ?≈)
