@@ -1,6 +1,13 @@
-;; TLA mode
+;;; tla-mode.el --- TLA+ language support for Emacs
+
+;; Copyright (C) 2015-2016 Ratish Punnoose
+
 ;; Author: Ratish Punnoose
-;;
+;; Version: 1.0
+;; URL: https://github.com/ratish-punnoose/tla-mode
+;; Created: 8 Jun 2015
+
+;;; Code:
 
 (defvar tla-mode-map
    (let ((map (make-sparse-keymap)))
@@ -61,6 +68,7 @@
      )))
 
 
+;;;###autoload
 (define-derived-mode tla-mode prog-mode "TLA"
   "TLA mode is a major mode for writing TLA+ specifications"
   :syntax-table tla-mode-syntax-table
@@ -148,3 +156,5 @@
   )
 
 (provide 'tla-mode)
+
+;;; tla-mode.el ends here
