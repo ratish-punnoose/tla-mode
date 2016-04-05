@@ -155,6 +155,10 @@
   (prettify-symbols-mode)  
   )
 
+;;;###autoload
+(add-to-list 'auto-mode-alist
+             '("\\.tla\\'" . tla-mode))
+
 (provide 'tla-mode)
 
 ;;; tla-mode.el ends here
