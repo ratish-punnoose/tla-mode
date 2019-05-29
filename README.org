@@ -1,0 +1,75 @@
+# Do not edit README.md.  It is generated from README.org
+* Installation
+  1. Place the tla-mode.el in the load-path for emacs.  Reasonable places may be:
+     1. /usr/share/emacs/site-lisp (usually in the load-path)
+     2. .emacs.d (if it is in the load-path).
+  2. Add to emacs initialization.
+     1. Simple method in .emacs or .emacs.d/init.el
+	#+begin_src emacs-lisp
+	  (require 'tla-mode)
+	#+end_src
+     2. With use-package
+	#+begin_src emacs-lisp
+	  (use-package tla-mode  :mode "\\.tla$")
+	#+end_src
+* tla-mode Features
+  tla-mode for emacs provides a major mode for TLA+
+** Syntax highlighting
+   Syntax for TLA+ is highlighted.  PlusCal syntax is not highlighted.
+** Auto keyword capitalization
+   Keywords can be typed lower case.  They are recognized and
+   converted to upper-case automatically.
+** Simple code-indentation
+   Code can be indented when hitting the Tab key. Here are cases
+   where this functionality works.
+   1. Hitting tab at the beginning of a line cycles the indentation
+      through the /\\ and \\/ symbols found on the previous line.
+   2. Hitting tab after typing  a word at the beginning of a line
+      moves cursor below the last ==.
+   3. Hitting tab after THEN or ELSE, indent the line to the last IF
+      or ELSE.
+** Pretty symbols
+   tla-mode supports pretty symbols in conjunction with the
+   prettify-symbols-mode.
+   - tla-mode is smart enough to check if a
+     symbol rendering is available by the font in use and it only
+     prettifies symbols for which a rendering is available.
+   - When symbols are used, tla-mode adds extra spaces to symbols to
+     ensure that they have the same width as the character sequence
+     they replace.
+
+   Note the following:
+   1. TLA+ is indentation sensitive. So it is useful to use a
+      mono-spaced font.
+   1. Monospaced coding fonts have only a small number of the symbols
+      that TLA+ actually supports.
+   2. It is possible to use a fallback font. i.e. a fallback font is
+      used for a symbol if the primary font does not have a rendering
+      for the symbol.
+   3. However, even if a fallback font is used, the width of characters
+      with that font will be different from the primary font causing
+      inconsistent spacing.
+
+   To make this work correctly, do the following:
+   1. Find a fallback font that supports symbols and has the same
+      width as the primary font. Luckily, a good soul has a solution
+      for this.   [[https://github.com/cpitclaudel/monospacifier]] has a tool to
+      adjust a variable width font to match the width of a reference
+      font.  The same site also has ready to download symbol fonts
+      that are already fixed up to match some commonly used coding fonts.
+   2. Symbola is a font with good symbol support.  To add it as a
+      fallback font, do something like the following.
+      #+begin_src emacs-lisp
+	(dolist (ft (fontset-list))
+	  (set-fontset-font ft 'unicode (font-spec :name "Consolas"))
+	  (set-fontset-font ft 'unicode (font-spec :name "Symbola monospacified for Consolas") nil 'append))
+      #+end_src
+   3. In tla-mode,  enable prettify-symbols-mode  (M-x
+      prettify-symbols-mode).  To do this always, add a hook
+      #+begin_src emacs-lisp
+      (add-hook 'tla-mode 'prettify-symbols-mode)
+      #+end_src
+** Auto template insertion
+   When opening an empty .tla file, the Module header and footer is automatically added.
+   This can be prevented by setting tla-template-by-default to nil.
+
