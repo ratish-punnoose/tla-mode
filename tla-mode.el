@@ -64,21 +64,21 @@
   "If t then auto insert a tla template into empty files.")
 
 (defun tla-fixcase-keywords (beg end length)
-  "Automatically fix case for keywords."
+  "Automatically fix case for keywords starting at BEG to END with LENGTH."
   ;; 1. Check if region is small. based on beg/end.
   ;;   if small then go back one, check thing at point and upcase it.
   ;; 2. If region is larger, then start at beg and go forward one word
   ;;   at a time until end. check thing at point and upcase.
   (cond ((and (= (- end beg) 1)
-              (eq (car (syntax-after (1- end))) 0))
-         (save-excursion
-           (backward-char 1)
-           (let ((curr-word (thing-at-point 'word t)))
-             (when (and (stringp curr-word)
-                        (member (upcase curr-word) tla-mode-keywords))
-               (backward-word)
-               (upcase-word 1)))
-        ))))
+	      (eq (car (syntax-after (1- end))) 0))
+	 (save-excursion
+	   (backward-char 1)
+	   (let ((curr-word (thing-at-point 'word t)))
+	     (when (and (stringp curr-word)
+			(member (upcase curr-word) tla-mode-keywords))
+	       (backward-word)
+	       (upcase-word 1)))
+	   ))))
 
 (defun tla-stop-keywordfix ()
   "Remove tla hook to auto upcase keywords."
@@ -87,19 +87,19 @@
 
 
 (defun tla-get-indent-of (prev curr-col)
-  "Indent current location to a previous text symbol"
+  "Get indent of PREV starting from CURR-COL."
   (let ((indent-col 0)
-        (curr-col (current-column))
-        (curr-line 0))
+	(curr-col (current-column))
+	(curr-line 0))
     (setq curr-line (line-number-at-pos))
     (save-excursion
       (search-backward prev 0 t)
       (cond ((or (not (match-string 0)) ; no find
-                 (= curr-line (line-number-at-pos))) ; find on
-                                        ; same line
-             (setq indent-col curr-col)) ;; No better than current column
-            (t
-             (setq indent-col (current-column)))))
+		 (= curr-line (line-number-at-pos))) ; find on
+					; same line
+	     (setq indent-col curr-col)) ;; No better than current column
+	    (t
+	     (setq indent-col (current-column)))))
     indent-col))
 
 
@@ -108,19 +108,19 @@
   "Insert a TLA template"
   (interactive)
   (let ((this-file-name (buffer-file-name)) ; absolute file name or nil
-        (insertion-point 0)
-        (fill-len 0)) ;; Extra chars on first line to get to 80
+	(insertion-point 0)
+	(fill-len 0)) ;; Extra chars on first line to get to 80
     (when this-file-name          ;; for legal files
       (goto-char 1)               ;; at beginning of file
       (setq this-file-name
-            (file-name-sans-extension
-             (file-name-nondirectory
-              this-file-name)))
+	    (file-name-sans-extension
+	     (file-name-nondirectory
+	      this-file-name)))
       (setq fill-len
-        (- 80
-           (+ 13 (string-width this-file-name))))
+	(- 80
+	   (+ 13 (string-width this-file-name))))
       (setq fill-len
-            (if (< fill-len 0) 0  fill-len))
+	    (if (< fill-len 0) 0  fill-len))
       (insert
        (make-string 4 ?-)         ;; 4 dashes
        " MODULE "
@@ -153,65 +153,65 @@
   ;;
 
   (let ((indent-col 0)
-        (curr-col (current-column))
-        (curr-line 0))  ;;(case-fold-search t)) ;; case-sensitive search
+	(curr-col (current-column))
+	(curr-line 0))  ;;(case-fold-search t)) ;; case-sensitive search
     (cond ((or (= 0 curr-col)
-               (looking-back "^[[:blank:]]*"))
-                                        ; No text before cursor on current line
-           (cond
-            ((looking-at "[[:blank:]]*THEN")
-             (search-forward "THEN" (point-at-eol) t)
-             (setq indent-col (tla-get-indent-of "IF" curr-col))
-             (indent-line-to indent-col))
+	       (looking-back "^[[:blank:]]*"))
+					; No text before cursor on current line
+	   (cond
+	    ((looking-at "[[:blank:]]*THEN")
+	     (search-forward "THEN" (point-at-eol) t)
+	     (setq indent-col (tla-get-indent-of "IF" curr-col))
+	     (indent-line-to indent-col))
 
-            ((looking-at "[[:blank:]]*ELSE")
-             (search-forward "ELSE" (point-at-eol) t)
-             (setq indent-col (tla-get-indent-of "THEN" curr-col))
-             (indent-line-to indent-col))
+	    ((looking-at "[[:blank:]]*ELSE")
+	     (search-forward "ELSE" (point-at-eol) t)
+	     (setq indent-col (tla-get-indent-of "THEN" curr-col))
+	     (indent-line-to indent-col))
 
-            (t ;
-             (save-excursion
-               (setq indent-col
-                     ;;(beginning-of-line)
-                     (condition-case nil
-                         (progn
-                           (forward-line -1) ; go up one line
-                           (if (> curr-col 0)
-                               (move-to-column (+ 1 curr-col)))
-                           (cond ((re-search-forward "\\(/\\\\\\|\\\\/\\|IF\\|THEN\\|ELSE\\)"
-                                                     (line-end-position)
-                                                     t)
-                                  ;; if search successful
-                                  (goto-char (match-beginning 0))
-                                  (current-column))
-                                 (t
-                                        ; no match
-                                  (current-indentation))))
-                       (error 0))))
-             (indent-line-to indent-col))))
+	    (t ;
+	     (save-excursion
+	       (setq indent-col
+		     ;;(beginning-of-line)
+		     (condition-case nil
+			 (progn
+			   (forward-line -1) ; go up one line
+			   (if (> curr-col 0)
+			       (move-to-column (+ 1 curr-col)))
+			   (cond ((re-search-forward "\\(/\\\\\\|\\\\/\\|IF\\|THEN\\|ELSE\\)"
+						     (line-end-position)
+						     t)
+				  ;; if search successful
+				  (goto-char (match-beginning 0))
+				  (current-column))
+				 (t
+					; no match
+				  (current-indentation))))
+		       (error 0))))
+	     (indent-line-to indent-col))))
 
-          ;; after else
-          ((looking-back  "[[:blank:]]*ELSE[[:blank:]]*"
-                         (point-at-bol))
-           (search-backward "ELSE" (point-at-bol) t)
-           (setq indent-col (tla-get-indent-of "THEN" curr-col))
-           (beginning-of-line)
-           (indent-line-to indent-col)
-           (end-of-line))
+	  ;; after else
+	  ((looking-back  "[[:blank:]]*ELSE[[:blank:]]*"
+			 (point-at-bol))
+	   (search-backward "ELSE" (point-at-bol) t)
+	   (setq indent-col (tla-get-indent-of "THEN" curr-col))
+	   (beginning-of-line)
+	   (indent-line-to indent-col)
+	   (end-of-line))
 
-          ; after then
-          ((looking-back  "[[:blank:]]*THEN[[:blank:]]*"
-                         (point-at-bol))
-           (search-backward "THEN" (point-at-bol) t)
-           (setq indent-col (tla-get-indent-of "IF" curr-col))
-           (beginning-of-line)
-           (indent-line-to indent-col)
-           (end-of-line))
+	  ; after then
+	  ((looking-back  "[[:blank:]]*THEN[[:blank:]]*"
+			 (point-at-bol))
+	   (search-backward "THEN" (point-at-bol) t)
+	   (setq indent-col (tla-get-indent-of "IF" curr-col))
+	   (beginning-of-line)
+	   (indent-line-to indent-col)
+	   (end-of-line))
 
-          (t ; look for ==
-           (setq indent-col (tla-get-indent-of "==" curr-col))
-           (indent-to-column indent-col))
-          )))
+	  (t ; look for ==
+	   (setq indent-col (tla-get-indent-of "==" curr-col))
+	   (indent-to-column indent-col))
+	  )))
 
 
 
@@ -247,22 +247,21 @@
      )))
 
 (defun tla-symbol-compose (elt)
-  "add spaces to symbols to match indentation."
+  "Add spaces to symbols in ELT to match indentation."
   (interactive)
   (let ((key (car elt))
-        (len-of-key  (length (car elt)))
-        (sym (cdr elt))
-        (composelist '()))
+	(len-of-key  (length (car elt)))
+	(sym (cdr elt))
+	(composelist '()))
     (cons key
-          (cons sym
-                (dotimes (i (1- len-of-key) composelist)
-                  (push ?\s composelist)
-                  (push '(Br . Bl) composelist))))))
+	  (cons sym
+		(dotimes (i (1- len-of-key) composelist)
+		  (push ?\s composelist)
+		  (push '(Br . Bl) composelist))))))
 
 
 
 
-;;;###autoload
 (defvar tla-symbols-alist
   (mapcar
    'tla-symbol-compose
@@ -272,7 +271,8 @@
     ;; system.
     ;; We filter in only the symbols for which there is a font
     ;; available.
-    (lambda (elt) (internal-char-font 1 (cdr elt)))
+    ;;(lambda (elt) (internal-char-font 1 (cdr elt)))
+    (lambda (elt) (char-displayable-p (cdr elt)))
     '(
       ("/\\" . ?∧)          ("\\land" . ?∧)
       ("\\/" . ?∨)          ("\\lor" . ?∨)
@@ -344,6 +344,8 @@
       ("LAMBDA" . ?λ)))))
 
 
+
+
 ;;;###autoload
   ;;(set-char-table-parent table char-width-table)
   ;;  (setq char-width-table table)))
@@ -365,10 +367,9 @@
   (setq-local indent-tabs-mode nil)
   ;; Debugging args fail with starter kit.
   (add-hook 'after-change-functions 'tla-fixcase-keywords t t)
-  ;; prettify symbols-mode is not set automatically. See readme
-  ;;(prettify-symbols-mode)
+  (prettify-symbols-mode)
   (when (and tla-template-by-default
-             (= (point-max) 1))
+	     (= (point-max) 1))
     (tla-template))
 
   )
@@ -377,7 +378,7 @@
 
 ;;;###autoload
 (add-to-list 'auto-mode-alist
-             '("\\.tla\\'" . tla-mode))
+	     '("\\.tla\\'" . tla-mode))
 
 (provide 'tla-mode)
 
