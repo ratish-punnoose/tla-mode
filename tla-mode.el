@@ -42,13 +42,13 @@
     "CONSTANT" "CONSTANTS" "VARIABLE" "VARIABLES"
     "IF" "THEN" "ELSE"
     "CHOOSE" "CASE" "OTHER"
-    "LET"
+    "LET" "IN"
     "RECURSIVE"
     "ENABLED" "UNCHANGED"
     "SUBSET" "UNION"
     "DOMAIN" "EXCEPT"
     "SPEC" "LAMBDA"
-    "THEOREM" "ASSUME" "NEW" "PROVE"
+    "THEOREM" "ASSUME" "NEW" "PROVE" "ASSUMPTION" "AXIOM"
     ;; Keywords for proofs
     "PROOF" "OBVIOUS" "OMITTED" "BY" "QED"
     "SUFFICES" "PICK" "HAVE" "TAKE" "WITNESS"
@@ -56,7 +56,7 @@
     ))
 
 (defvar tla-mode-types
-  '("Int" "BOOLEAN"))
+  '("Int" "BOOLEAN" "Naturals" "Integers" "Reals"))
 
 (defvar tla-tab-width 2 "Width of a tab.")
 
@@ -75,7 +75,10 @@
 	   (backward-char 1)
 	   (let ((curr-word (thing-at-point 'word t)))
 	     (when (and (stringp curr-word)
-			(member (upcase curr-word) tla-mode-keywords))
+			(or
+			 (member (upcase curr-word) tla-mode-keywords)
+			 (member (upcase curr-word) tla-mode-types)
+			 (member (upcase curr-word) tla-mode-constants)))
 	       (backward-word)
 	       (upcase-word 1)))
 	   ))))
@@ -169,6 +172,11 @@
 	     (setq indent-col (tla-get-indent-of "THEN" curr-col))
 	     (indent-line-to indent-col))
 
+	    ((looking-at "[[:blank:]]*IN")
+	     (search-forward "IN" (point-at-eol) t)
+	     (setq indent-col (tla-get-indent-of "LET" curr-col))
+	     (indent-line-to indent-col))
+
 	    (t ;
 	     (save-excursion
 	       (setq indent-col
@@ -199,11 +207,20 @@
 	   (indent-line-to indent-col)
 	   (end-of-line))
 
-	  ; after then
+	  ;; after then
 	  ((looking-back  "[[:blank:]]*THEN[[:blank:]]*"
 			 (point-at-bol))
 	   (search-backward "THEN" (point-at-bol) t)
 	   (setq indent-col (tla-get-indent-of "IF" curr-col))
+	   (beginning-of-line)
+	   (indent-line-to indent-col)
+	   (end-of-line))
+
+	  ;; after IN
+	  ((looking-back  "[[:blank:]]*IN[[:blank:]]*"
+			 (point-at-bol))
+	   (search-backward "IN" (point-at-bol) t)
+	   (setq indent-col (tla-get-indent-of "LET" curr-col))
 	   (beginning-of-line)
 	   (indent-line-to indent-col)
 	   (end-of-line))
