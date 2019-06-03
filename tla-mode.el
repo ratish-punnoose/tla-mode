@@ -80,7 +80,10 @@
 			 (member (upcase curr-word) tla-mode-types)
 			 (member (upcase curr-word) tla-mode-constants)))
 	       (backward-word)
-	       (upcase-word 1)))
+	       ;; Check for whitespace before word
+	       (when (or (bolp)
+		       (eq (char-before) ?\s))
+		   (upcase-word 1))))
 	   ))))
 
 (defun tla-stop-keywordfix ()
